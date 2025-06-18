@@ -11,19 +11,19 @@ jobs:
       - name: Set up Python
         uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: '3.12'
+          miniconda-version: "latest"
           environment-file: MLProject/conda.yaml
           activate-environment: mlflow-env
           auto-activate-base: false
 
       - name: Check Env
-        run: | 
-          conda env list
-          pip install dagshub
-          dagshub login --token ${{ secrets.DAGSHUB_TOKEN }}
+        run: conda env list
+
 
       - name: Install dependencies
-        run: echo "done at Set up Python"
+        run: | 
+          pip install dagshub mlflow
+          dagshub login --token ${{ secrets.DAGSHUB_TOKEN }}
 
       - name: Run MLFlow Project
         id: run_mlflow
