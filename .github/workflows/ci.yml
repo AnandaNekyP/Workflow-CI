@@ -18,8 +18,8 @@ jobs:
 
       - name: Check Env
         run: | 
-          conda init
-          conda activate mlflow-env
+          conda env list
+          pip install dagshub
           dagshub login --token ${{ secrets.DAGSHUB_TOKEN }}
 
       - name: Install dependencies
