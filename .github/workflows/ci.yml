@@ -18,6 +18,7 @@ jobs:
 
       - name: Check Env
         run: | 
+          conda init
           conda activate mlflow-env
           dagshub login --token ${{ secrets.DAGSHUB_TOKEN }}
 
