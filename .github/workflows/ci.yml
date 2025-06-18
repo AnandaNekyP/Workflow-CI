@@ -29,7 +29,7 @@ jobs:
         id: run_mlflow
         working-directory: MLProject
         run: |
-          output=$(mlflow run .)
+          output=$(mlflow run . --env-manager=local)
           echo "$output"
           echo "run_output=$output" >> $GITHUB_ENV
 
