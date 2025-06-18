@@ -2,5 +2,4 @@ name: Hiring Prediction Project
 conda_env: conda.yaml
 
 entry_points:
-  train:
     command: "python modelling.py"
