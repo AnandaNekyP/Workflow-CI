@@ -1,0 +1,26 @@
+name: CI
+on: [push]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.12' 
+
+            - name: Install dependencies
+              run: pip install pandas numpy scikit-learn
+
+            - name: Run prepocessing
+              working-directory: preprocessing
+              run: python automate_anandanp.py
+
+            - name: Upload preprocessed data
+              uses: actions/upload-artifact@v4
+              with:
+                name: preprocessed_data
+                path: preprocessing/recruitment_data_preprocessing.csv
