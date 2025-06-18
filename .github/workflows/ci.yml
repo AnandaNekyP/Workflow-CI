@@ -1,26 +1,63 @@
 name: CI
 on: [push]
+
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Set up Python
-              uses: actions/setup-python@v5
-              with:
-                python-version: '3.12' 
+      - name: Set up Python
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: '3.12-slim'
+          activate-environment: mlflow-env
+          environment-file: MLProject/conda.yaml
+          auto-activate-base: false
 
-            - name: Install dependencies
-              run: pip install pandas numpy scikit-learn
+      - name: Check Env
+        run: | 
+          conda env list
+          dagshub login --token ${{ secrets.DAGSHUB_TOKEN }}
 
-            - name: Run prepocessing
-              working-directory: preprocessing
-              run: python automate_anandanp.py
+      - name: Install dependencies
+        run: echo "done at Set up Python"
 
-            - name: Upload preprocessed data
-              uses: actions/upload-artifact@v4
-              with:
-                name: preprocessed_data
-                path: preprocessing/recruitment_data_preprocessing.csv
+      - name: Run MLFlow Project
+        id: run_mlflow
+        working-directory: MLProject
+        run: |
+          output=$(mlflow run .)
+          echo "$output"
+          echo "run_output=$output" >> $GITHUB_ENV
+
+      - name: Get latest MLFlow run ID
+        id: mlflow_run
+        run: |
+          echo "Extracting run ID..."
+          run_id=$(echo "${{ env.run_output }}" | grep 'Run ID' | awk '{print $3}')
+          echo "RUN_ID=$run_id" >> $GITHUB_ENV
+          echo "run_id=$run_id" >> $GITHUB_OUTPUT
+
+      - name: Upload ML artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact
+          path: MLProject/mlartifact/${{ env.RUN_ID }}
+
+      - name: Build Docker Model
+        working-directory: MLProject
+        run: mlflow models build-docker --model-uri "runs:/${{ env.RUN_ID }}/model/" --name "hiring_prediction_model"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Tag Docker Image
+        run: docker tag hiring_prediction_model ${{ vars.DOCKERHUB_USERNAME }}/hiring_prediction_model:latest
+
+      - name: Push Docker Image
+        run: docker push ${{ vars.DOCKERHUB_USERNAME }}/hiring_prediction_model:latest
