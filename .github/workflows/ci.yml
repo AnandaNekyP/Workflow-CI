@@ -12,13 +12,13 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: '3.12'
-          activate-environment: mlflow-env
           environment-file: MLProject/conda.yaml
+          activate-environment: mlflow-env
           auto-activate-base: false
 
       - name: Check Env
         run: | 
-          conda env list
+          conda activate mlflow-env
           dagshub login --token ${{ secrets.DAGSHUB_TOKEN }}
 
       - name: Install dependencies
