@@ -19,6 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install dagshub mlflow
+          dagshub login --token ${{ secrets.DAGSHUB_TOKEN }}
 
       - name: Run MLFlow Project
         id: run_mlflow
