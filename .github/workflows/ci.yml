@@ -23,17 +23,14 @@ jobs:
           echo "MLFLOW_TRACKING_USERNAME=${{ secrets.MLFLOW_TRACKING_USERNAME }}" >> $GITHUB_ENV
           echo "MLFLOW_TRACKING_PASSWORD=${{ secrets.MLFLOW_TRACKING_PASSWORD }}" >> $GITHUB_ENV
 
-      - name: Run MLflow Project
+      - name: Run MLflow Project and Capture RUN_ID
+        id: run_mlflow
         run: |
           cd MLProject
           mlflow run . --env-manager=local | tee output.log
           RUN_ID=$(grep -oP 'Run ID: \K[^ ]+' output.log)
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
-          echo "::set-output name=run_id::$RUN_ID"
-
-      - name: Get latest MLFlow run ID
-        id: mlflow_run
-        run: echo "RUN_ID=$RUN_ID"
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
 
           
       # - name: Install python dependencies
@@ -43,10 +40,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifact
-          path: MLProject/mlartifacts/${{ env.RUN_ID }}
+          path: MLProject
 
       - name: Build Docker Model
-        working-directory: MLProject
         run: |
           echo "Using Run ID: ${{ env.RUN_ID }}"
           mlflow models build-docker \
