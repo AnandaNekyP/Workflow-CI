@@ -8,7 +8,7 @@ WORKDIR /opt/mlflow
 COPY MLProject/requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY MLProject/mlruns /opt/mlflow/mlruns
+COPY mlruns /opt/mlflow/mlruns
 
 RUN python -c "from mlflow.models import container as C; C._install_pyfunc_deps('/opt/mlflow/mlruns/0/${{ env.RUN_ID }}/artifacts/model', install_mlflow=False, enable_mlserver=False, env_manager='virtualenv')"
 
