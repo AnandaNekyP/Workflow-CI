@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r MLProject/requirements.txt
-          echo "MLFLOW_TRACKING_URI=${{ vars.MLFLOW_TRACKING_URI }}" >> $GITHUB_ENV
+          # echo "MLFLOW_TRACKING_URI=${{ vars.MLFLOW_TRACKING_URI }}" >> $GITHUB_ENV
           echo "MLFLOW_TRACKING_USERNAME=${{ secrets.MLFLOW_TRACKING_USERNAME }}" >> $GITHUB_ENV
           echo "MLFLOW_TRACKING_PASSWORD=${{ secrets.MLFLOW_TRACKING_PASSWORD }}" >> $GITHUB_ENV
 
@@ -30,7 +30,7 @@ jobs:
           mlflow run . --env-manager=local | tee output.log
 
           echo "Attempting to extract run ID..."
-          RUN_ID=$(grep -oE "[a-f0-9]{32}" output.log | head -n 1)
+          RUN_ID=$(grep -oE "ID '[a-f0-9]{32}'" output.log | head -n1 | cut -d"'" -f2)
 
           echo "Extracted RUN_ID: $RUN_ID"
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
