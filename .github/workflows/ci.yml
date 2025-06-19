@@ -34,10 +34,9 @@ jobs:
           run_id=$(echo "${{ env.run_output }}" | grep 'Run ID' | awk '{print $3}')
           echo "RUN_ID=$run_id" >> $GITHUB_ENV
           echo "run_id=$run_id" >> $GITHUB_OUTPUT
-      - name: Install python dependencies
-        run: pip install -r MLProject/requirements.txt
+      # - name: Install python dependencies
+      #   run: pip install -r MLProject/requirements.txt
 
-        
       - name: Upload ML artifact
         uses: actions/upload-artifact@v4
         with:
