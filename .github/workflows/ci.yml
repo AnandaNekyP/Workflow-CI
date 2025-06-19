@@ -31,6 +31,8 @@ jobs:
 
           echo "Attempting to extract run ID..."
           RUN_ID=$(grep "Run (ID '" output.log | sed -E "s/.*ID '([a-f0-9]{32})'.*/\1/")
+          cat -A output.log  # Shows invisible characters like ^M, tabs, etc.
+
 
           echo "Extracted RUN_ID: $RUN_ID"
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
