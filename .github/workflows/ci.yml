@@ -27,15 +27,13 @@ jobs:
         run: |
           cd MLProject
           mlflow run . --env-manager=local | tee output.log
-          RUN_ID=$(grep -oP 'Run ID: \K[^ ]+' output.log)
-
-
-
+          RUN_ID=$(grep 'MLFLOW_RUN_ID=' output.log | cut -d'=' -f2)
+          
       - name: Get latest MLFlow run ID
         id: mlflow_run
         run: |
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
-          echo "::set-output name=run_id::$RUN_ID"
+          echo "Latest run_id: $RUN_ID"
           
       # - name: Install python dependencies
       #   run: pip install -r MLProject/requirements.txt
