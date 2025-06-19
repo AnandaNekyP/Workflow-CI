@@ -24,9 +24,9 @@ jobs:
         id: run_mlflow
         working-directory: MLProject
         run: |
-          output=$(mlflow run . --env-manager local)
-          echo "$output"
-          echo "run_output=$output" >> $GITHUB_ENV
+          mlflow run . --env-manager local
+          RUN_ID=$(grep 'MLFLOW_RUN_ID=' output.log | cut -d'=' -f2)
+          echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
 
       - name: Get latest MLFlow run ID
         id: mlflow_run
