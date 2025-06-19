@@ -27,11 +27,16 @@ jobs:
         id: run_mlflow
         run: |
           cd MLProject
+          set -o pipefail
           mlflow run . --env-manager=local | tee output.log
-          cat output.log
-          RUN_ID=$(grep -oP '(?<=run_id: )\w+' output.log | head -n 1)
-          echo "RUN_ID=${RUN_ID}" >> $GITHUB_ENV
-          echo "RUN_ID=${RUN_ID}" >> $GITHUB_OUTPUT
+          EXIT_CODE=${PIPESTATUS[0]}
+          
+          RUN_ID=$(grep -oE "'[a-f0-9]{32}'" output.log | head -n 1 | tr -d "'")
+          echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
+          echo "Latest run_id: $RUN_ID"
+
+          exit $EXIT_CODE
+
 
       # - name: Install python dependencies
       #   run: pip install -r MLProject/requirements.txt
