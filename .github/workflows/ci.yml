@@ -23,15 +23,23 @@ jobs:
           echo "MLFLOW_TRACKING_USERNAME=${{ secrets.MLFLOW_TRACKING_USERNAME }}" >> $GITHUB_ENV
           echo "MLFLOW_TRACKING_PASSWORD=${{ secrets.MLFLOW_TRACKING_PASSWORD }}" >> $GITHUB_ENV
 
-      - name: Run MLflow Project and Capture RUN_ID
+      - name: Run MLflow Project
         id: run_mlflow
         run: |
           cd MLProject
           mlflow run . --env-manager=local | tee output.log
-          cat output.log
-          RUN_ID=$(grep 'MLFLOW_RUN_ID=' output.log | cut -d'=' -f2)
+          
+          RUN_ID=$(grep -oP "Run \(ID '\K[^']+" output.log)
+          
+          if [ -z "$RUN_ID" ]; then
+            echo "::error::Failed to extract RUN_ID"
+            cat output.log
+            exit 1
+          fi
+          
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
-          echo "Latest run_id: $RUN_ID"
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "Extracted RUN_ID: $RUN_ID"
 
           
       # - name: Install python dependencies
