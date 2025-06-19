@@ -46,16 +46,13 @@ jobs:
 
       - name: Build Docker Model
         run: |
-          MODEL_PATH="MLProject/mlruns/0/${{ env.RUN_ID }}/artifacts/model"
-          
-          if [ ! -d "$MODEL_PATH" ]; then
-            echo "Model artifacts not found at $MODEL_PATH"
-            exit 1
-          fi
-
           mlflow models build-docker \
-            --model-uri "$MODEL_PATH" \
-            --name "hiring_prediction_model"
+            --model-uri "runs:/${{ env.RUN_ID }}/model" \
+            --name "hiring_prediction_model" \
+            --install-mlflow \
+            --env-manager local \
+            --enable-mlserver false \
+            --entry-point '["gunicorn", "--timeout", "60", "-b", "0.0.0.0:8000", "-w", "1", "mlflow.pyfunc.scoring_server.wsgi:app"]'
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
