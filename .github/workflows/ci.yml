@@ -9,43 +9,38 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: conda-incubator/setup-miniconda@v3
+        uses: actions/setup-python@v5
         with:
-          miniconda-version: "latest"
-          environment-file: MLProject/conda.yaml
-          activate-environment: mlflow-env
-          auto-activate-base: false
+          python-version: "3.12"
 
       - name: Check Env
-        run: conda env list
-
+        run: pip list
 
       - name: Install dependencies
-        run: | 
+        run: |
           pip install dagshub mlflow
-          dagshub login --token ${{ secrets.DAGSHUB_TOKEN }}
 
       - name: Run MLFlow Project
         id: run_mlflow
         working-directory: MLProject
         run: |
-          output=$(mlflow run . --env-manager=local)
+          output=$(mlflow run . --env-manager local)
           echo "$output"
           echo "run_output=$output" >> $GITHUB_ENV
 
       - name: Get latest MLFlow run ID
         id: mlflow_run
         run: |
-          echo "Extracting run ID..."
           run_id=$(echo "${{ env.run_output }}" | grep 'Run ID' | awk '{print $3}')
           echo "RUN_ID=$run_id" >> $GITHUB_ENV
           echo "run_id=$run_id" >> $GITHUB_OUTPUT
-
+      - name: Install python dependencies
+        run: pip install -r MLProject/requirements.txt
       - name: Upload ML artifact
         uses: actions/upload-artifact@v4
         with:
           name: artifact
-          path: MLProject/mlartifact/${{ env.RUN_ID }}
+          path: MLProject/mlartifacts/${{ env.RUN_ID }}
 
       - name: Build Docker Model
         working-directory: MLProject
