@@ -4,11 +4,6 @@ import mlflow
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingClassifier
 
-import dagshub
-
-dagshub.init(repo_owner="AnandaNekyP", repo_name="Membangun_model", mlflow=True)
-mlflow.set_tracking_uri("https://dagshub.com/AnandaNekyP/Membangun_model.mlflow")
-
 # mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.autolog()
 
