@@ -55,7 +55,7 @@ jobs:
 
           mlflow models build-docker \
             --model-uri "$MODEL_PATH" \
-            --name "hiring_prediction_model"
+            --name "hiring_prediction_model"\
             --enable-mlserver
 
       # - name: Build Docker Model
