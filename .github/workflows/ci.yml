@@ -44,7 +44,7 @@ jobs:
         run: |
           echo "Using RUN_ID: ${{ env.RUN_ID }}"
           export MLFLOW_TRACKING_URI=./MLProject/mlruns
-          mlflow models build-docker --model-uri "runs:/${{ env.RUN_ID }}/artifacts/model" --name "hiring_prediction_model"
+          mlflow models build-docker --model-uri "runs:/${{ env.RUN_ID }}/model" --name "hiring_prediction_model"
 
       - name: Slim the Docker Image
         uses: kitabisa/docker-slim-action@v1
