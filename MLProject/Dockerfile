@@ -1,15 +1,19 @@
-FROM ubuntu:20.04
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY . .
 
 RUN apt-get update && \
-    apt-get install -y python3.12 python3-pip
+    apt-get install -y wget git && \
+    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh && \
+    bash miniconda.sh -b -p /opt/conda && \
+    rm miniconda.sh && \
+    /opt/conda/bin/conda init bash
 
-WORKDIR /opt/mlflow
+ENV PATH="/opt/conda/bin:$PATH"
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN conda env create -f conda.yaml
 
-COPY mlruns /opt/mlflow/mlruns
-
-RUN python -c "from mlflow.models import container as C; C._install_pyfunc_deps('/opt/mlflow/mlruns/0/${{ env.RUN_ID }}/artifacts/model', install_mlflow=False, enable_mlserver=False, env_manager='virtualenv')"
-
-CMD ["mlflow", "models", "serve", "--model-uri", "runs:/${{ env.RUN_ID }}/model", "--host", "0.0.0.0", "--port", "8000"]
+SHELL ["conda", "run", "-n", "mlflow_env", "/bin/bash", "-c"]
+ENTRYPOINT ["conda", "run", "-n", "mlflow_env", "mlflow", "run", "."]
