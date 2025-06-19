@@ -28,14 +28,20 @@ jobs:
         run: |
           cd MLProject
           set -o pipefail
+
+          # Run MLflow project and capture both output and exit code
           mlflow run . --env-manager=local | tee output.log
           EXIT_CODE=${PIPESTATUS[0]}
-          
+
+          # Extract first 32-char hex ID found in single quotes
           RUN_ID=$(grep -oE "'[a-f0-9]{32}'" output.log | head -n 1 | tr -d "'")
+
+          # Save to GitHub environment and print
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
           echo "Latest run_id: $RUN_ID"
 
           exit $EXIT_CODE
+
 
 
       # - name: Install python dependencies

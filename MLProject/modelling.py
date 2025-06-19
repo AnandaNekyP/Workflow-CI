@@ -1,4 +1,6 @@
 import pandas as pd
+import mlflow.models
+import mlflow.server
 import numpy as np
 import mlflow
 from sklearn.model_selection import train_test_split
@@ -33,6 +35,8 @@ def train_model(x_train, y_train):
     return model
 
 
-df = load_data(INPUT_PATH)
-x_train, y_train, x_test, y_test = split_data(df)
-model = train_model(x_train, y_train)
+with mlflow.start_run():
+    df = load_data(INPUT_PATH)
+    x_train, y_train, x_test, y_test = split_data(df)
+    model = train_model(x_train, y_train)
+    print(mlflow.)
