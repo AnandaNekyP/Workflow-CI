@@ -28,6 +28,7 @@ jobs:
         run: |
           cd MLProject
           mlflow run . --env-manager=local | tee output.log
+          cat output.log
           RUN_ID=$(grep 'MLFLOW_RUN_ID=' output.log | cut -d'=' -f2)
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
           echo "Latest run_id: $RUN_ID"
