@@ -32,7 +32,6 @@ jobs:
       - name: Get latest MLFlow run ID
         id: mlflow_run
         run: |
-          mlflow run . --env-manager local | tee output.log
           RUN_ID=$(grep -oP 'Run ID: \K[^ ]+' output.log)
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
           echo "::set-output name=run_id::$RUN_ID"
