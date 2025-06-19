@@ -28,11 +28,15 @@ jobs:
         run: |
           cd MLProject
           mlflow run . --env-manager=local 2>&1 | tee output.log
-
-          RUN_ID=$(grep -oE "[a-f0-9]{32}" output.log | head -n 1)
-
+          
+          RUN_ID=$(grep "MLFLOW_RUN_ID=" output.log | cut -d'=' -f2)
+          
+          if [ -z "$RUN_ID" ]; then
+            RUN_ID=$(grep -oE "[a-f0-9]{32}" output.log | head -n1)
+          fi
+          
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
-          echo "Latest run_id: $RUN_ID"
+          echo "Validated RUN_ID: $RUN_ID"
 
       - name: Upload ML artifact
         uses: actions/upload-artifact@v4
@@ -42,17 +46,16 @@ jobs:
 
       - name: Build Docker Model
         run: |
-          echo "Using RUN_ID: ${{ env.RUN_ID }}"
-          export MLFLOW_TRACKING_URI=./MLProject/mlruns
-          mlflow models build-docker --model-uri "runs:/${{ env.RUN_ID }}/model" --name "hiring_prediction_model"
+          MODEL_PATH="MLProject/mlruns/0/${{ env.RUN_ID }}/artifacts/model"
+          
+          if [ ! -d "$MODEL_PATH" ]; then
+            echo "Model artifacts not found at $MODEL_PATH"
+            exit 1
+          fi
 
-      # - name: Slim the Docker Image
-      #   uses: kitabisa/docker-slim-action@v1
-      #   env:
-      #     DSLIM_HTTP_PROBE: false
-      #   with:
-      #     target: hiring_prediction_model
-      #     tag: latest
+          mlflow models build-docker \
+            --model-uri "$MODEL_PATH" \
+            --name "hiring_prediction_model"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3

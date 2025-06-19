@@ -35,8 +35,10 @@ def train_model(x_train, y_train):
     return model
 
 
-with mlflow.start_run():
+with mlflow.start_run() as run:
     df = load_data(INPUT_PATH)
     x_train, y_train, x_test, y_test = split_data(df)
     model = train_model(x_train, y_train)
-    # print(mlflow.)
+    
+    mlflow.sklearn.log_model(model, "model")
+    print(f"MLFLOW_RUN_ID={run.info.run_id}")
