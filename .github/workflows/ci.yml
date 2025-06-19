@@ -44,15 +44,34 @@ jobs:
           name: artifact
           path: MLProject
 
+      # - name: Build Docker Model
+      #   run: |
+      #     MODEL_PATH="MLProject/mlruns/0/${{ env.RUN_ID }}/artifacts/model"
+          
+      #     if [ ! -d "$MODEL_PATH" ]; then
+      #       echo "Model artifacts not found at $MODEL_PATH"
+      #       exit 1
+      #     fi
+
+      #     mlflow models build-docker \
+      #       --model-uri "$MODEL_PATH" \
+      #       --name "hiring_prediction_model"
+
       - name: Build Docker Model
         run: |
-          mlflow models build-docker \
+          echo "Using RUN_ID: ${{ env.RUN_ID }}"
+          export MLFLOW_TRACKING_URI=./MLProject/mlruns
+          
+          # Generate Dockerfile first
+          mlflow models generate-dockerfile \
             --model-uri "runs:/${{ env.RUN_ID }}/model" \
-            --name "hiring_prediction_model" \
-            --install-mlflow \
-            --env-manager local \
-            --enable-mlserver false \
-            --entry-point '["gunicorn", "--timeout", "60", "-b", "0.0.0.0:8000", "-w", "1", "mlflow.pyfunc.scoring_server.wsgi:app"]'
+            --output-file Dockerfile
+            
+          # Modify Dockerfile to bind to 0.0.0.0
+          sed -i 's|CMD \["mlflow", "models", "serve"|CMD \["mlflow", "models", "serve", "--host", "0.0.0.0"|' Dockerfile
+          
+          # Build the image
+          docker build -t hiring_prediction_model -f Dockerfile .
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
