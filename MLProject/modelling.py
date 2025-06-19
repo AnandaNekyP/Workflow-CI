@@ -4,7 +4,6 @@ import mlflow
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingClassifier
 
-# mlflow.set_tracking_uri("http://localhost:5000")
 mlflow.autolog()
 
 INPUT_PATH = "recruitment_data_preprocessing.csv"
