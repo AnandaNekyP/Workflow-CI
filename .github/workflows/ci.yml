@@ -62,7 +62,7 @@ jobs:
         run: |
           echo "Using RUN_ID: ${{ env.RUN_ID }}"
           export MLFLOW_TRACKING_URI=./MLProject/mlruns
-          docker build -t hiring_prediction_model MLProject
+          DOCKER_BUILDKIT=1 docker build -t hiring_prediction_model MLProject
 
           
       - name: Login to Docker Hub
