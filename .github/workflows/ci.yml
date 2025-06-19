@@ -63,11 +63,17 @@ jobs:
           echo "Using RUN_ID: ${{ env.RUN_ID }}"
           export MLFLOW_TRACKING_URI=./MLProject/mlruns
           
+          mkdir -p docker_build
+          
           mlflow models generate-dockerfile \
             --model-uri "runs:/${{ env.RUN_ID }}/model" \
-            --output-directory docker_build
+            --output-directory docker_build \
+            --env-manager virtualenv  # Use virtualenv instead of local
           
           sed -i 's|CMD \["mlflow", "models", "serve"|CMD \["mlflow", "models", "serve", "--host", "0.0.0.0"|' docker_build/Dockerfile
+          
+          sed -i '/RUN python -c "from mlflow.models import container as C; C._install_pyfunc_deps/a \
+          RUN pip install -r /opt/mlflow/requirements.txt' docker_build/Dockerfile
           
           docker build -t hiring_prediction_model -f docker_build/Dockerfile docker_build
           
