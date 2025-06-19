@@ -28,9 +28,16 @@ jobs:
         run: |
           cd MLProject
           mlflow run . --env-manager=local | tee output.log
+
+          echo "Attempting to extract run ID..."
+          cat output.log | grep "Run (ID '" || echo "No match found in output.log"
+          
           RUN_ID=$(grep -oE "Run \(ID '[a-f0-9]{32}'\)" output.log | sed -E "s/.*ID '([a-f0-9]+)'.*/\1/")
+          
+          echo "Extracted RUN_ID: $RUN_ID"
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
           echo "Latest run_id: $RUN_ID"
+
 
 
 
