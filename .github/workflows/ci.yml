@@ -32,6 +32,14 @@ jobs:
           RUN_ID=$(grep -oP "Run \(ID '\K[^']+" output.log)
           
           if [ -z "$RUN_ID" ]; then
+            RUN_ID=$(grep -oP "run with ID '\K[^']+" output.log)
+          fi
+          
+          if [ -z "$RUN_ID" ]; then
+            RUN_ID=$(mlflow runs list --experiment-id 0 --max-results 1 | grep -oP '\|\s+\K[^\s]+' | head -1)
+          fi
+          
+          if [ -z "$RUN_ID" ]; then
             echo "::error::Failed to extract RUN_ID"
             cat output.log
             exit 1
