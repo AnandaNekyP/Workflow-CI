@@ -8,3 +8,4 @@ scipy==1.15.3
 dagshub==0.5.10
 matplotlib==3.10.3
 yellowbrick==1.5
+distutils
