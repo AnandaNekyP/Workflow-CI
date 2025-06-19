@@ -5,7 +5,7 @@ RUN apt-get update && \
 
 WORKDIR /opt/mlflow
 
-COPY MLProject/requirements.txt .
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY mlruns /opt/mlflow/mlruns
