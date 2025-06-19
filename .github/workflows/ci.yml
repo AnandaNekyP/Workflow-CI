@@ -41,38 +41,35 @@ jobs:
       - name: Upload ML artifact
         uses: actions/upload-artifact@v4
         with:
-          name: artifact
-          path: MLProject
-
-      - name: Build Docker Model
-        run: |
-          MODEL_PATH="MLProject/mlruns/0/${{ env.RUN_ID }}/artifacts/model"
-          
-          if [ ! -d "$MODEL_PATH" ]; then
-            echo "Model artifacts not found at $MODEL_PATH"
-            exit 1
-          fi
-
-          mlflow models build-docker \
-            --model-uri "$MODEL_PATH" \
-            --name "hiring_prediction_model"\
-            --enable-mlserver
+          name: artifacts
+          path: MLProject/mlruns/0/${{ env.RUN_ID }}/artifacts
 
       # - name: Build Docker Model
       #   run: |
-      #     echo "Using RUN_ID: ${{ env.RUN_ID }}"
-      #     export MLFLOW_TRACKING_URI=./MLProject/mlruns
+      #     MODEL_PATH="MLProject/mlruns/0/${{ env.RUN_ID }}/artifacts/model"
           
-      #     # Generate Dockerfile first
-      #     mlflow models generate-dockerfile \
-      #       --model-uri "runs:/${{ env.RUN_ID }}/model" \
-      #       --output-file Dockerfile
-            
-      #     # Modify Dockerfile to bind to 0.0.0.0
-      #     sed -i 's|CMD \["mlflow", "models", "serve"|CMD \["mlflow", "models", "serve", "--host", "0.0.0.0"|' Dockerfile
+      #     if [ ! -d "$MODEL_PATH" ]; then
+      #       echo "Model artifacts not found at $MODEL_PATH"
+      #       exit 1
+      #     fi
+
+      #     mlflow models build-docker \
+      #       --model-uri "$MODEL_PATH" \
+      #       --name "hiring_prediction_model"\
+      #       --enable-mlserver
+
+      - name: Build Docker Model
+        run: |
+          echo "Using RUN_ID: ${{ env.RUN_ID }}"
+          export MLFLOW_TRACKING_URI=./MLProject/mlruns
           
-      #     # Build the image
-      #     docker build -t hiring_prediction_model -f Dockerfile .
+          mlflow models generate-dockerfile \
+            --model-uri "runs:/${{ env.RUN_ID }}/model" \
+            --output-directory docker_build
+          
+          sed -i 's|CMD \["mlflow", "models", "serve"|CMD \["mlflow", "models", "serve", "--host", "0.0.0.0"|' docker_build/Dockerfile
+          
+          docker build -t hiring_prediction_model -f docker_build/Dockerfile docker_build
           
       - name: Login to Docker Hub
         uses: docker/login-action@v3
