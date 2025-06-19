@@ -28,9 +28,10 @@ jobs:
         run: |
           cd MLProject
           mlflow run . --env-manager=local | tee output.log
-          RUN_ID=$(grep -oP 'Run ID: \K[^ ]+' output.log)
+          RUN_ID=$(grep -oP "Run \(ID '\K[^']+" output.log) 
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
           echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "Extracted RUN_ID: $RUN_ID"
 
           
       # - name: Install python dependencies
@@ -44,7 +45,7 @@ jobs:
 
       - name: Build Docker Model
         run: |
-          echo "Using Run ID: ${{ env.RUN_ID }}"
+          echo "Using RUN_ID: ${{ env.RUN_ID }}"
           mlflow models build-docker \
             --model-uri "runs:/${{ env.RUN_ID }}/model" \
             --name "hiring_prediction_model"
