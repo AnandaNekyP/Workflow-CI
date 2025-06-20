@@ -37,3 +37,5 @@ with mlflow.start_run():
     df = load_data(INPUT_PATH)
     x_train, y_train, x_test, y_test = split_data(df)
     model = train_model(x_train, y_train)
+    mlflow.sklearn.log_model(model, "model")
+
