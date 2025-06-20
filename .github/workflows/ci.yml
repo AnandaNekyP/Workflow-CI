@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifacts
-          path: MLProject/mlruns/0/${{ env.RUN_ID }}/artifacts
+          path: MLProject
 
       - name: Build Docker Model
         run: |
