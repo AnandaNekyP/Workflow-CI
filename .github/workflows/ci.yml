@@ -46,7 +46,7 @@ jobs:
 
       - name: Build Docker Model
         run: |
-          MODEL_PATH="MLProject/mlartifacts/0/${{ env.RUN_ID }}/artifacts/model"
+          MODEL_PATH="MLProject/mlruns/0/${{ env.RUN_ID }}/artifacts/model"
           
           if [ ! -d "$MODEL_PATH" ]; then
             echo "Model artifacts not found at $MODEL_PATH"
