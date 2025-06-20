@@ -1,6 +1,8 @@
 import pandas as pd
+import mlflow.models
+import mlflow.server
+import numpy as np
 import mlflow
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingClassifier
 
@@ -15,7 +17,6 @@ def load_data(path):
 
 
 def split_data(df):
-
     train_df, test_df = train_test_split(df, test_size=0.2, random_state=42)
 
     train_dataset = mlflow.data.from_pandas(train_df, name="train")
@@ -34,7 +35,10 @@ def train_model(x_train, y_train):
     return model
 
 
-with mlflow.start_run():
+with mlflow.start_run() as run:
     df = load_data(INPUT_PATH)
     x_train, y_train, x_test, y_test = split_data(df)
     model = train_model(x_train, y_train)
+    
+    mlflow.sklearn.log_model(model, "model")
+    print(f"MLFLOW_RUN_ID={run.info.run_id}")
