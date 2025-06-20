@@ -38,33 +38,23 @@ jobs:
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
           echo "Validated RUN_ID: $RUN_ID"
 
-      - name: Upload ML artifact
+      - name: Upload ML artifact to GitHub
         uses: actions/upload-artifact@v4
         with:
           name: artifacts
           path: MLProject/mlruns/0/${{ env.RUN_ID }}/artifacts
 
-      # - name: Build Docker Model
-      #   run: |
-      #     MODEL_PATH="MLProject/mlruns/0/${{ env.RUN_ID }}/artifacts/model"
-          
-      #     if [ ! -d "$MODEL_PATH" ]; then
-      #       echo "Model artifacts not found at $MODEL_PATH"
-      #       exit 1
-      #     fi
-
-      #     mlflow models build-docker \
-      #       --model-uri "$MODEL_PATH" \
-      #       --name "hiring_prediction_model"\
-      #       --enable-mlserver
-
       - name: Build Docker Model
         run: |
-          echo "Using RUN_ID: ${{ env.RUN_ID }}"
-          export MLFLOW_TRACKING_URI=./MLProject/mlruns
-          DOCKER_BUILDKIT=1 docker build -t hiring_prediction_model MLProject
-
+          MODEL_PATH="MLProject/mlartifacts/0/${{ env.RUN_ID }}/artifacts/model"
           
+          if [ ! -d "$MODEL_PATH" ]; then
+            echo "Model artifacts not found at $MODEL_PATH"
+            exit 1
+          fi
+
+          mlflow models build-docker --model-uri "$MODEL_PATH" --name "hiring_prediction_model"
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
