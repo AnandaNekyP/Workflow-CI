@@ -3,9 +3,7 @@ import numpy as np
 import mlflow
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingClassifier
-import os
 
-os.environ["MLFLOW_AUTOLOGGING_DISABLE_FOR_SKLEARN"] = "true"
 mlflow.autolog()
 
 INPUT_PATH = "recruitment_data_preprocessing.csv"
