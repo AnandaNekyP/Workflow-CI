@@ -24,7 +24,6 @@ jobs:
           echo "MLFLOW_TRACKING_PASSWORD=${{ secrets.MLFLOW_TRACKING_PASSWORD }}" >> $GITHUB_ENV
 
       - name: Run MLflow Project and Capture RUN_ID
-        id: run_mlflow
         run: |
           cd MLProject
           mlflow run . --env-manager=local 2>&1 | tee output.log

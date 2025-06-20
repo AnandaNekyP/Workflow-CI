@@ -1,6 +1,4 @@
 import pandas as pd
-import mlflow.models
-import mlflow.server
 import numpy as np
 import mlflow
 from sklearn.model_selection import train_test_split
