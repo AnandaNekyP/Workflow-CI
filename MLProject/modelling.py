@@ -39,4 +39,3 @@ with mlflow.start_run() as run:
     df = load_data(INPUT_PATH)
     x_train, y_train, x_test, y_test = split_data(df)
     model = train_model(x_train, y_train)
-    print(f"MLFLOW_RUN_ID={run.info.run_id}")
